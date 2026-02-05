@@ -86,7 +86,8 @@ class GenerateClaudeHandler:
             Tupla (path_claude_md, historial_actualizado)
         """
         # Prompt final que usa TODO el contexto
-        prompt = """Ahora, usando TODA la documentación que acabas de generar (POM.md, POM-components.md, playwright.md y cucumber.md), crea un archivo CLAUDE.md.
+        prompt = """Ahora, usando TODA la documentación que acabas de generar \
+(POM.md, POM-components.md, playwright.md y cucumber.md), crea un archivo CLAUDE.md.
 
 Este archivo es una GUÍA para Claude Code (asistente IA) que ayudará al usuario a:
 1. Implementar el POM que diseñaste
@@ -122,7 +123,8 @@ Instrucciones específicas para que Claude Code asista en:
 - Migración de selectores
 - Debugging de tests
 
-FORMATO: Markdown claro, conciso, con ejemplos concretos basados en la documentación que ya generaste."""
+FORMATO: Markdown claro, conciso, con ejemplos concretos basados en la \
+documentación que ya generaste."""
 
         # Generar con LLM manteniendo TODO el historial
         response, updated_history = self.llm_service.generate_with_history(

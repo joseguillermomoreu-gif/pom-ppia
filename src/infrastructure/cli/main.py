@@ -163,8 +163,8 @@ def _filter_mcp_tests(all_tests, test_repository):
 
     for test_path in all_tests:
         try:
-            # Intentar leer el test
-            test_file = test_repository.read_test(test_path)
+            # Intentar leer el test para validar
+            _ = test_repository.read_test(test_path)
             valid_tests.append(test_path)
 
         except MCPTestDetectedError:

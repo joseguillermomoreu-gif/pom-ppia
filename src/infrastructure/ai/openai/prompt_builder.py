@@ -13,7 +13,8 @@ class PromptBuilder:
     patrones de prompt engineering.
     """
 
-    SYSTEM_PROMPT_POM = """Eres un experto en Page Object Model (POM) para Playwright con TypeScript.
+    SYSTEM_PROMPT_POM = """Eres un experto en Page Object Model (POM) para \
+Playwright con TypeScript.
 
 REGLAS CRÍTICAS:
 1. SOLO usa selectores que aparecen EXACTAMENTE en los tests proporcionados
@@ -279,7 +280,8 @@ Given('usuario está en login', async function() {{
 - Estructura de archivos
 - Cómo añadir scenarios
 
-**IMPORTANTE:** Step definitions DEBEN usar Page Objects con selectores EXACTOS del test original."""
+**IMPORTANTE:** Step definitions DEBEN usar Page Objects con selectores EXACTOS \
+del test original."""
 
         return prompt
 
@@ -357,6 +359,7 @@ export const loginData = {{ ... }};
 - Estructura de archivos
 - Cómo añadir tests nuevos
 
-**CRÍTICO:** El código refactorizado debe hacer EXACTAMENTE lo mismo que el original, solo usando POM."""
+**CRÍTICO:** El código refactorizado debe hacer EXACTAMENTE lo mismo que el \
+original, solo usando POM."""
 
         return prompt

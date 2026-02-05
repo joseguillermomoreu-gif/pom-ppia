@@ -85,7 +85,8 @@ class GeneratePlaywrightHandler:
         )
 
         # Añadir referencia explícita al contexto
-        prompt = f"""Usando el POM que acabas de generar en el mensaje anterior, ahora refactoriza los tests.
+        prompt = f"""Usando el POM que acabas de generar en el mensaje anterior, \
+ahora refactoriza los tests.
 
 {base_prompt}
 

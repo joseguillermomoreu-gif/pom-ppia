@@ -8,7 +8,6 @@ from openai import RateLimitError as OpenAIRateLimitError
 from openai import Timeout as OpenAITimeout
 from rich.console import Console
 from rich.panel import Panel
-from rich.syntax import Syntax
 
 from src.domain.repository.llm_service import LLMService
 from src.infrastructure.config.settings import settings
