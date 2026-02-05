@@ -131,7 +131,7 @@ class TestFile:
     def _extract_context(self, selector: str) -> str:
         """Extrae el contexto del selector desde los comentarios."""
         # Buscar en comentarios de test.step()
-        step_pattern = rf"test\.step\(['\"](.+?)['\"]\s*,\s*async"
+        step_pattern = r"test\.step\(['\"](.+?)['\"]\s*,\s*async"
         matches = re.finditer(step_pattern, self.content)
 
         for match in matches:

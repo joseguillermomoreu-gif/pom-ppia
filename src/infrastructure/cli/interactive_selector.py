@@ -74,12 +74,19 @@ class InteractiveSelector:
         Returns:
             Lista de tests seleccionados
         """
-        console.print("\n[bold cyan]═══════════════════════════════════════════════════════[/bold cyan]")
+        console.print(
+            "\n[bold cyan]═══════════════════════════════════════════════════════[/bold cyan]"
+        )
         console.print("[bold white]¿Qué tests deseas procesar?[/bold white]\n")
         console.print("  [bold green]a[/bold green]  → Procesar [bold]TODOS[/bold] los tests")
-        console.print("  [bold cyan]1,3,5[/bold cyan] → Procesar tests específicos (números separados por comas)")
+        console.print(
+            "  [bold cyan]1,3,5[/bold cyan] → Procesar tests específicos "
+            "(números separados por comas)"
+        )
         console.print("  [bold red]q[/bold red]  → [bold]SALIR[/bold] del programa\n")
-        console.print("[bold cyan]═══════════════════════════════════════════════════════[/bold cyan]")
+        console.print(
+            "[bold cyan]═══════════════════════════════════════════════════════[/bold cyan]"
+        )
 
         while True:
             try:
@@ -103,7 +110,10 @@ class InteractiveSelector:
                     return self._parse_selection(choice, test_files)
 
                 else:
-                    console.print("[red]❌ Selección vacía. Escribe 'a' (todos), números (1,3,5) o 'q' (salir)[/red]")
+                    console.print(
+                        "[red]❌ Selección vacía. Escribe 'a' (todos), "
+                        "números (1,3,5) o 'q' (salir)[/red]"
+                    )
 
             except KeyboardInterrupt:
                 console.print("\n[yellow]👋 Cancelado por el usuario[/yellow]")

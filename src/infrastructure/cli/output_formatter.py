@@ -38,7 +38,7 @@ class OutputFormatter:
 ║    [dim]Transforma tests declarativos TypeScript en documentación POM[/dim]      ║
 ║    [dim]estructurada y tests refactorizados con Page Object Model[/dim]         ║
 ║                                                                        ║
-║    [yellow]Autor:[/yellow] [white]José Guillermo Moreu[/white]                                     ║
+║    [yellow]Autor:[/yellow] [white]José Guillermo Moreu[/white]                                   ║
 ║                                                                        ║
 ╚════════════════════════════════════════════════════════════════════════╝
 [/bold cyan]

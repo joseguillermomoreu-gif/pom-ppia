@@ -85,7 +85,8 @@ class GenerateCucumberHandler:
         )
 
         # Añadir referencia explícita al contexto
-        prompt = f"""Usando el POM y los tests refactorizados (playwright.md) que ya generaste, ahora crea la versión con Cucumber.
+        prompt = f"""Usando el POM y los tests refactorizados (playwright.md) que ya \
+generaste, ahora crea la versión con Cucumber.
 
 {base_prompt}
 

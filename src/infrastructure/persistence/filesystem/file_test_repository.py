@@ -5,7 +5,6 @@ from pathlib import Path
 from typing import List
 
 from src.domain.model.test_file import TestFile
-from src.domain.model.test_step import TestStep
 from src.domain.repository.test_repository import TestRepository
 from src.domain.service.test_analyzer import TestAnalyzer
 from src.infrastructure.exceptions import MCPTestDetectedError, TestFileError
