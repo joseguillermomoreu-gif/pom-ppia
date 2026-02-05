@@ -66,36 +66,44 @@ class InteractiveSelector:
         """
         Solicita al usuario que seleccione tests.
 
+        Acepta:
+        - 'a' o 'all' para todos los tests
+        - 'q' o 'quit' para salir
+        - Números directamente (ej: 1,3,5)
+
         Returns:
             Lista de tests seleccionados
         """
-        console.print("\n[bold]¿Qué deseas procesar?[/bold]")
-        console.print("  [cyan][a][/cyan] Todos los tests")
-        console.print("  [cyan][n][/cyan] Número específico (ej: 1,3,5)")
-        console.print("  [cyan][q][/cyan] Salir")
+        console.print("\n[bold cyan]═══════════════════════════════════════════════════════[/bold cyan]")
+        console.print("[bold white]¿Qué tests deseas procesar?[/bold white]\n")
+        console.print("  [bold green]a[/bold green]  → Procesar [bold]TODOS[/bold] los tests")
+        console.print("  [bold cyan]1,3,5[/bold cyan] → Procesar tests específicos (números separados por comas)")
+        console.print("  [bold red]q[/bold red]  → [bold]SALIR[/bold] del programa\n")
+        console.print("[bold cyan]═══════════════════════════════════════════════════════[/bold cyan]")
 
         while True:
             try:
                 choice = console.input("\n[bold yellow]Selección:[/bold yellow] ").strip().lower()
 
-                if choice == "a":
+                # Procesar todos los tests
+                if choice in ("a", "all"):
                     console.print(
                         f"\n[green]✓ Seleccionados: {len(test_files)} tests[/green]"
                     )
                     return test_files
 
-                elif choice == "q":
-                    console.print("[yellow]👋 Cancelado por el usuario[/yellow]")
+                # Salir
+                elif choice in ("q", "quit"):
+                    console.print("\n[yellow]👋 Cancelado por el usuario[/yellow]")
                     sys.exit(0)
 
-                elif choice == "n":
-                    numbers = console.input(
-                        "[bold yellow]Números (ej: 1,3,5):[/bold yellow] "
-                    ).strip()
-                    return self._parse_selection(numbers, test_files)
+                # Números directos o vacío
+                elif choice:
+                    # Intentar parsear como números
+                    return self._parse_selection(choice, test_files)
 
                 else:
-                    console.print("[red]❌ Opción inválida. Usa 'a', 'n' o 'q'[/red]")
+                    console.print("[red]❌ Selección vacía. Escribe 'a' (todos), números (1,3,5) o 'q' (salir)[/red]")
 
             except KeyboardInterrupt:
                 console.print("\n[yellow]👋 Cancelado por el usuario[/yellow]")
@@ -108,33 +116,52 @@ class InteractiveSelector:
         Parsea selección numérica del usuario.
 
         Args:
-            numbers: String con números (ej: "1,3,5")
+            numbers: String con números (ej: "1,3,5" o "1 3 5")
             test_files: Lista de tests disponibles
 
         Returns:
             Lista de tests seleccionados
         """
         try:
-            indices = [int(n.strip()) for n in numbers.split(",")]
+            # Soportar tanto comas como espacios
+            numbers_clean = numbers.replace(",", " ")
+            indices = [int(n.strip()) for n in numbers_clean.split() if n.strip()]
+
+            if not indices:
+                console.print("[red]❌ No se proporcionaron números válidos[/red]")
+                return self._prompt_selection(test_files)
 
             selected = []
+            invalid_numbers = []
+
             for idx in indices:
                 if 1 <= idx <= len(test_files):
                     selected.append(test_files[idx - 1])
                 else:
-                    console.print(
-                        f"[yellow]⚠ Número {idx} fuera de rango (ignorado)[/yellow]"
-                    )
+                    invalid_numbers.append(idx)
+
+            # Mostrar warnings de números inválidos
+            if invalid_numbers:
+                console.print(
+                    f"[yellow]⚠ Números fuera de rango (1-{len(test_files)}): "
+                    f"{', '.join(map(str, invalid_numbers))}[/yellow]"
+                )
 
             if not selected:
                 console.print("[red]❌ No se seleccionaron tests válidos[/red]")
                 return self._prompt_selection(test_files)
 
             console.print(f"\n[green]✓ Seleccionados: {len(selected)} tests[/green]")
+
+            # Mostrar qué tests se seleccionaron
+            for test_path in selected:
+                console.print(f"  [dim]• {test_path.name}[/dim]")
+
             return selected
 
-        except ValueError:
+        except ValueError as e:
             console.print(
-                "[red]❌ Formato inválido. Usa números separados por comas (ej: 1,3,5)[/red]"
+                f"[red]❌ Formato inválido: {str(e)}[/red]"
             )
+            console.print("[yellow]Ejemplos válidos: 1,3,5 o 1 3 5[/yellow]")
             return self._prompt_selection(test_files)

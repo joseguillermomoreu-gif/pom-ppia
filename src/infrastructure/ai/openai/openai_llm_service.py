@@ -40,7 +40,20 @@ class OpenAILLMService(LLMService):
         self.max_retries = max_retries
         self.retry_delay = retry_delay
 
-        self.client = OpenAI(api_key=self.api_key)
+        # Inicializar cliente OpenAI
+        # Nota: Requiere httpx 0.27.0+ para compatibilidad con OpenAI SDK 1.50.0
+        try:
+            self.client = OpenAI(
+                api_key=self.api_key,
+                timeout=60.0,
+                max_retries=0,  # Manejamos retries manualmente
+            )
+
+        except Exception as e:
+            raise LLMServiceError(
+                f"Error al inicializar OpenAI client: {str(e)}\n"
+                f"Verifica que httpx esté instalado correctamente (requiere 0.27.0+)"
+            ) from e
 
         # Precios por 1K tokens (aproximados, verificar en OpenAI)
         self.pricing = {

@@ -21,13 +21,34 @@ class OutputFormatter:
 
     @staticmethod
     def print_header(input_dir: Path, pom_path: Path | None = None) -> None:
-        """Muestra header inicial."""
-        console.print("\n[bold cyan]🤖 POM-PPIA Generator[/bold cyan]")
-        console.print(f"[dim]Directorio: {input_dir}[/dim]")
+        """Muestra header inicial con banner ASCII art."""
+        banner = """
+[bold cyan]
+╔════════════════════════════════════════════════════════════════════════╗
+║                                                                        ║
+║    ██████╗  ██████╗ ███╗   ███╗     ██████╗ ██████╗ ██╗ █████╗       ║
+║    ██╔══██╗██╔═══██╗████╗ ████║     ██╔══██╗██╔══██╗██║██╔══██╗      ║
+║    ██████╔╝██║   ██║██╔████╔██║     ██████╔╝██████╔╝██║███████║      ║
+║    ██╔═══╝ ██║   ██║██║╚██╔╝██║     ██╔═══╝ ██╔═══╝ ██║██╔══██║      ║
+║    ██║     ╚██████╔╝██║ ╚═╝ ██║     ██║     ██║     ██║██║  ██║      ║
+║    ╚═╝      ╚═════╝ ╚═╝     ╚═╝     ╚═╝     ╚═╝     ╚═╝╚═╝  ╚═╝      ║
+║                                                                        ║
+║            [bold white]Generador de POM y Tests desde Playwright[/bold white]                ║
+║                                                                        ║
+║    [dim]Transforma tests declarativos TypeScript en documentación POM[/dim]      ║
+║    [dim]estructurada y tests refactorizados con Page Object Model[/dim]         ║
+║                                                                        ║
+║    [yellow]Autor:[/yellow] [white]José Guillermo Moreu[/white]                                     ║
+║                                                                        ║
+╚════════════════════════════════════════════════════════════════════════╝
+[/bold cyan]
+        """
+        console.print(banner)
+        console.print(f"[bold]📂 Directorio:[/bold] [cyan]{input_dir}[/cyan]")
 
         if pom_path:
             console.print(
-                f"[green]📖 POM existente detectado: {pom_path.name}[/green]"
+                f"[bold green]📖 POM existente detectado:[/bold green] [cyan]{pom_path.name}[/cyan]"
             )
 
     @staticmethod
