@@ -20,9 +20,9 @@ COPY pyproject.toml ./
 RUN pip install --no-cache-dir \
     openai==1.50.0 \
     python-dotenv==1.0.0 \
-    pydantic==2.5.0 \
-    pydantic-settings==2.1.0 \
-    pyyaml==6.0 \
+    pydantic==2.10.5 \
+    pydantic-settings==2.7.1 \
+    pyyaml==6.0.2 \
     click==8.1.7 \
     rich==13.7.0
 
