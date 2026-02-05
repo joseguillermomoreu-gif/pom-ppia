@@ -53,6 +53,7 @@ output/
 *.md
 !README.md
 !MEMORY.md
+!DOCKER.md
 
 # OS
 .DS_Store
