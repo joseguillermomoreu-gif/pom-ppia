@@ -1,7 +1,7 @@
 """Puerto: Servicio de LLM (interface)."""
 
 from abc import ABC, abstractmethod
-from typing import Optional
+from typing import Dict, List, Optional, Tuple
 
 
 class LLMService(ABC):
@@ -63,5 +63,32 @@ class LLMService(ABC):
 
         Returns:
             Número de tokens
+        """
+        pass
+
+    @abstractmethod
+    def generate_with_history(
+        self,
+        prompt: str,
+        conversation_history: List[Dict[str, str]],
+        system_prompt: Optional[str] = None,
+        temperature: float = 0.7,
+        max_tokens: int = 4000,
+    ) -> Tuple[str, List[Dict[str, str]]]:
+        """
+        Genera respuesta manteniendo historial de conversación.
+
+        Args:
+            prompt: Prompt del usuario
+            conversation_history: Historial de mensajes previos
+            system_prompt: Prompt del sistema (solo primera vez)
+            temperature: Temperatura para la generación
+            max_tokens: Máximo de tokens en la respuesta
+
+        Returns:
+            Tupla (respuesta, historial_actualizado)
+
+        Raises:
+            LLMServiceError: Si hay error en la API
         """
         pass

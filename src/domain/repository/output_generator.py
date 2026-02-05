@@ -83,6 +83,23 @@ class OutputGenerator(ABC):
         pass
 
     @abstractmethod
+    def save_claude(self, content: str, filename: str = "CLAUDE.md") -> Path:
+        """
+        Guarda el archivo CLAUDE.md.
+
+        Args:
+            content: Guía de refactorización para Claude Code
+            filename: Nombre del archivo (default: CLAUDE.md)
+
+        Returns:
+            Path al archivo guardado
+
+        Raises:
+            IOError: Si no se puede escribir el archivo
+        """
+        pass
+
+    @abstractmethod
     def get_output_dir(self) -> Path:
         """
         Retorna el directorio de salida configurado.

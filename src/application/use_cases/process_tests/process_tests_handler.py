@@ -1,7 +1,7 @@
 """Handler principal: ProcessTests."""
 
 import time
-from typing import List
+from typing import Dict, List
 
 from src.application.dto.generation_result import GenerationResult
 from src.application.use_cases.generate_cucumber.generate_cucumber_handler import (
@@ -64,16 +64,14 @@ class ProcessTestsHandler:
 
     def execute(self, command: ProcessTestsCommand) -> GenerationResult:
         """
-        Ejecuta el flujo completo de procesamiento.
+        Ejecuta el flujo completo con contexto compartido.
 
-        Flujo:
-        1. Leer archivos de test
-        2. Filtrar tests MCP
-        3. Analizar tests
-        4. Generar POM
-        5. Generar Cucumber
-        6. Generar Playwright
-        7. Retornar resultado
+        Flujo secuencial en UNA conversación:
+        1. Leer y analizar tests
+        2. Generar POM (primer mensaje)
+        3. Generar Playwright (conoce POM)
+        4. Generar Cucumber (conoce POM + Playwright)
+        5. Generar CLAUDE.md (conoce todo el contexto)
 
         Args:
             command: Comando con parámetros
@@ -98,27 +96,56 @@ class ProcessTestsHandler:
             analysis = self.test_analyzer.analyze_tests(test_files)
             result.set_metadata("analysis", analysis)
 
-            # Paso 3: Generar POM
-            pom_path, components_path = self.pom_handler.execute(
-                test_files=test_files, existing_pom_path=command.pom_md_path
+            # Paso 3: Generación secuencial con contexto compartido
+            conversation_history: List[Dict[str, str]] = []
+
+            # 3.1 Generar POM (primer mensaje - establece contexto)
+            pom_path, components_path, conversation_history = (
+                self.pom_handler.execute_with_history(
+                    test_files=test_files,
+                    existing_pom_path=command.pom_md_path,
+                    conversation_history=conversation_history,
+                )
             )
             result.add_file("pom", pom_path)
             result.add_file("pom_components", components_path)
 
-            # Paso 4: Generar Cucumber
-            cucumber_path = self.cucumber_handler.execute(test_files=test_files)
-            result.add_file("cucumber", cucumber_path)
-
-            # Paso 5: Generar Playwright
-            playwright_path = self.playwright_handler.execute(
-                test_files=test_files
+            # 3.2 Generar Playwright (conoce el POM generado)
+            playwright_path, conversation_history = (
+                self.playwright_handler.execute_with_history(
+                    test_files=test_files, conversation_history=conversation_history
+                )
             )
             result.add_file("playwright", playwright_path)
+
+            # 3.3 Generar Cucumber (conoce POM + Playwright)
+            cucumber_path, conversation_history = (
+                self.cucumber_handler.execute_with_history(
+                    test_files=test_files, conversation_history=conversation_history
+                )
+            )
+            result.add_file("cucumber", cucumber_path)
+
+            # 3.4 Generar CLAUDE.md (conoce TODO el contexto)
+            from src.application.use_cases.generate_claude.generate_claude_handler import (
+                GenerateClaudeHandler,
+            )
+
+            claude_handler = GenerateClaudeHandler(
+                self.llm_service, self.output_generator
+            )
+            claude_path, conversation_history = claude_handler.execute_with_history(
+                test_files=test_files, conversation_history=conversation_history
+            )
+            result.add_file("claude", claude_path)
 
             # Metadata final
             end_time = time.time()
             result.set_metadata("duration_seconds", round(end_time - start_time, 2))
-            result.set_metadata("output_dir", str(self.output_generator.get_output_dir()))
+            result.set_metadata(
+                "output_dir", str(self.output_generator.get_output_dir())
+            )
+            result.set_metadata("conversation_length", len(conversation_history))
 
         except Exception as e:
             result.add_error(f"Unexpected error: {str(e)}")
