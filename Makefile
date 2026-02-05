@@ -60,6 +60,16 @@ clean: ## Limpia archivos generados y contenedores
 
 restart: down up ## Reinicia el contenedor
 
+rebuild: ## Reconstruye imagen y reinicia (para desarrollo)
+	@echo "$(YELLOW)🔄 Reconstruyendo imagen...$(NC)"
+	@$(MAKE) down
+	@echo "$(GREEN)📦 Construyendo imagen sin cache...$(NC)"
+	@docker-compose build --no-cache
+	@$(MAKE) up
+	@echo "$(GREEN)✅ Imagen reconstruida y contenedor levantado$(NC)"
+	@echo ""
+	@echo "$(YELLOW)Usa 'make shell' para conectarte$(NC)"
+
 status: ## Muestra estado del contenedor
 	@echo "$(GREEN)📊 Estado del contenedor:$(NC)"
 	@docker-compose ps

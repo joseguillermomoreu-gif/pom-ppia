@@ -40,7 +40,20 @@ class OpenAILLMService(LLMService):
         self.max_retries = max_retries
         self.retry_delay = retry_delay
 
-        self.client = OpenAI(api_key=self.api_key)
+        # Inicializar cliente OpenAI con solo los parámetros soportados
+        # Nota: OpenAI SDK 1.50.0+ no soporta 'proxies' directamente
+        try:
+            self.client = OpenAI(
+                api_key=self.api_key,
+                timeout=60.0,  # Timeout de 60 segundos
+                max_retries=0,  # Manejamos retries manualmente
+            )
+        except TypeError as e:
+            # Si falla, intentar con solo api_key (compatible con versiones antiguas)
+            if "proxies" in str(e):
+                self.client = OpenAI(api_key=self.api_key)
+            else:
+                raise
 
         # Precios por 1K tokens (aproximados, verificar en OpenAI)
         self.pricing = {
