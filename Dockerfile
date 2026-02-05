@@ -17,7 +17,9 @@ RUN apt-get update && apt-get install -y \
 COPY pyproject.toml ./
 
 # Instalar dependencias Python
+# Nota: httpx debe ser compatible con openai 1.50.0
 RUN pip install --no-cache-dir \
+    httpx==0.27.0 \
     openai==1.50.0 \
     python-dotenv==1.0.0 \
     pydantic==2.10.5 \
