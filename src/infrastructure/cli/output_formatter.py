@@ -33,12 +33,12 @@ class OutputFormatter:
 ║    ██║     ╚██████╔╝██║ ╚═╝ ██║     ██║     ██║     ██║██║  ██║      ║
 ║    ╚═╝      ╚═════╝ ╚═╝     ╚═╝     ╚═╝     ╚═╝     ╚═╝╚═╝  ╚═╝      ║
 ║                                                                        ║
-║               [bold white]Generador de POM y Tests desde Playwright[/bold white]              ║
+║            [bold white]Generador de POM y Tests desde Playwright[/bold white]                ║
 ║                                                                        ║
 ║    [dim]Transforma tests declarativos TypeScript en documentación POM[/dim]      ║
 ║    [dim]estructurada y tests refactorizados con Page Object Model[/dim]         ║
 ║                                                                        ║
-║    [yellow]Autor:[/yellow] [white]jgmoreu[/white]  |  [yellow]Powered by:[/yellow] [white]OpenAI GPT-4[/white]                     ║
+║    [yellow]Autor:[/yellow] [white]José Guillermo Moreu[/white]                                     ║
 ║                                                                        ║
 ╚════════════════════════════════════════════════════════════════════════╝
 [/bold cyan]
