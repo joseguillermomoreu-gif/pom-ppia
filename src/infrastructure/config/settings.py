@@ -53,6 +53,14 @@ class Settings(BaseSettings):
     # Logging
     log_level: str = Field(default="INFO", description="Logging level")
 
+    # Debugging
+    debug_prompts: bool = Field(
+        default=False, description="Show prompts sent to LLM (blue colors)"
+    )
+    debug_openai_responses: bool = Field(
+        default=False, description="Show OpenAI responses (green color)"
+    )
+
     def __init__(self, **kwargs):
         """Initialize settings and create output dir if needed."""
         super().__init__(**kwargs)

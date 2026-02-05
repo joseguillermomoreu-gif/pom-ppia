@@ -6,10 +6,15 @@ from typing import Optional
 from openai import OpenAI, OpenAIError
 from openai import RateLimitError as OpenAIRateLimitError
 from openai import Timeout as OpenAITimeout
+from rich.console import Console
+from rich.panel import Panel
+from rich.syntax import Syntax
 
 from src.domain.repository.llm_service import LLMService
 from src.infrastructure.config.settings import settings
 from src.infrastructure.exceptions import LLMServiceError, RateLimitError, TimeoutError
+
+console = Console()
 
 
 class OpenAILLMService(LLMService):
@@ -82,6 +87,26 @@ class OpenAILLMService(LLMService):
 
         messages.append({"role": "user", "content": prompt})
 
+        # Debug: Mostrar prompts si está habilitado
+        if settings.debug_prompts:
+            if system_prompt:
+                console.print(
+                    Panel(
+                        system_prompt,
+                        title="📤 System Prompt",
+                        border_style="cyan",
+                        expand=False,
+                    )
+                )
+            console.print(
+                Panel(
+                    prompt,
+                    title="📤 User Prompt",
+                    border_style="blue",
+                    expand=False,
+                )
+            )
+
         delay = self.retry_delay
 
         for attempt in range(self.max_retries):
@@ -97,6 +122,17 @@ class OpenAILLMService(LLMService):
 
                 if content is None:
                     raise LLMServiceError("Empty response from OpenAI")
+
+                # Debug: Mostrar respuesta si está habilitado
+                if settings.debug_openai_responses:
+                    console.print(
+                        Panel(
+                            content,
+                            title=f"🤖 OpenAI Response ({self.model})",
+                            border_style="green",
+                            expand=False,
+                        )
+                    )
 
                 return content
 
