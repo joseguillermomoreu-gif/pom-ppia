@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  pom-ppia:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: pom-ppia:latest
+    container_name: pom-ppia
+
+    # Variables de entorno desde .env
+    env_file:
+      - .env
+
+    # Volúmenes para persistir datos
+    volumes:
+      # Código fuente (permite editar en host y ver cambios)
+      - ./src:/app/src
+
+      # Output (archivos generados aparecen en host)
+      - ./output:/app/output
+
+      # Tests de entrada (mount del directorio de tests)
+      - /var/www/EC2/code/End2EndTests/tests/ppia/generated:/tests:ro
+
+      # Configuración
+      - ./.env:/app/.env
+
+    # Mantener el contenedor vivo
+    stdin_open: true
+    tty: true
+
+    # Directorio de trabajo
+    working_dir: /app
+
+    # Comando por defecto
+    command: /bin/bash
