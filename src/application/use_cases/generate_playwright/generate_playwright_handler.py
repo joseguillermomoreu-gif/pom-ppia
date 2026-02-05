@@ -1,7 +1,7 @@
 """Handler: GeneratePlaywright."""
 
 from pathlib import Path
-from typing import List
+from typing import Dict, List, Tuple
 
 from src.domain.model.test_file import TestFile
 from src.domain.repository.llm_service import LLMService
@@ -61,3 +61,49 @@ class GeneratePlaywrightHandler:
         playwright_path = self.output_generator.save_playwright(response)
 
         return playwright_path
+
+    def execute_with_history(
+        self,
+        test_files: List[TestFile],
+        conversation_history: List[Dict[str, str]],
+    ) -> Tuple[Path, List[Dict[str, str]]]:
+        """
+        Ejecuta generación de Playwright manteniendo historial.
+
+        El LLM conoce el POM generado previamente en la conversación.
+
+        Args:
+            test_files: Tests a refactorizar
+            conversation_history: Historial de conversación (incluye POM)
+
+        Returns:
+            Tupla (path_playwright_md, historial_actualizado)
+        """
+        # Prompt que referencia el POM anterior
+        base_prompt = self.prompt_builder.build_playwright_refactor_prompt(
+            test_files=test_files
+        )
+
+        # Añadir referencia explícita al contexto
+        prompt = f"""Usando el POM que acabas de generar en el mensaje anterior, ahora refactoriza los tests.
+
+{base_prompt}
+
+IMPORTANTE: Usa las clases y métodos del POM que ya definiste."""
+
+        # Generar con LLM manteniendo historial
+        response, updated_history = self.llm_service.generate_with_history(
+            prompt=prompt,
+            conversation_history=conversation_history,
+            temperature=0.7,
+            max_tokens=4000,
+        )
+
+        # Asegurar header
+        if not response.strip().startswith("# "):
+            response = "# Playwright Tests (Refactored with POM)\n\n" + response
+
+        # Guardar archivo
+        playwright_path = self.output_generator.save_playwright(response)
+
+        return playwright_path, updated_history

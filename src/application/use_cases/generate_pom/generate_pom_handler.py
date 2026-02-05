@@ -1,7 +1,7 @@
 """Handler: GeneratePOM."""
 
 from pathlib import Path
-from typing import List, Optional
+from typing import Dict, List, Optional, Tuple
 
 from src.domain.model.test_file import TestFile
 from src.domain.repository.llm_service import LLMService
@@ -72,6 +72,53 @@ class GeneratePOMHandler:
         )
 
         return pom_path, components_path
+
+    def execute_with_history(
+        self,
+        test_files: List[TestFile],
+        conversation_history: List[Dict[str, str]],
+        existing_pom_path: Optional[Path] = None,
+    ) -> Tuple[Path, Path, List[Dict[str, str]]]:
+        """
+        Ejecuta generación de POM manteniendo historial de conversación.
+
+        Args:
+            test_files: Tests a analizar
+            conversation_history: Historial de conversación
+            existing_pom_path: Path a POM.md existente (opcional)
+
+        Returns:
+            Tupla (path_pom_md, path_pom_components_md, historial_actualizado)
+        """
+        # Leer POM existente si se proporciona
+        existing_pom = None
+        if existing_pom_path and existing_pom_path.exists():
+            existing_pom = existing_pom_path.read_text()
+
+        # Construir prompt
+        prompt = self.prompt_builder.build_pom_generation_prompt(
+            test_files=test_files, existing_pom=existing_pom
+        )
+
+        # Generar con LLM manteniendo historial
+        response, updated_history = self.llm_service.generate_with_history(
+            prompt=prompt,
+            conversation_history=conversation_history,
+            system_prompt=PromptBuilder.SYSTEM_PROMPT_POM,
+            temperature=0.7,
+            max_tokens=4000,
+        )
+
+        # Parsear respuesta
+        pom_content, components_content = self._parse_response(response)
+
+        # Guardar archivos
+        pom_path = self.output_generator.save_pom(pom_content)
+        components_path = self.output_generator.save_pom_components(
+            components_content
+        )
+
+        return pom_path, components_path, updated_history
 
     def _parse_response(self, response: str) -> tuple[str, str]:
         """
