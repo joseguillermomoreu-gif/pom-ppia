@@ -51,6 +51,10 @@ class MarkdownOutputGenerator(OutputGenerator):
         """Guarda el archivo playwright.md."""
         return self._save_file(content, filename)
 
+    def save_claude(self, content: str, filename: str = "CLAUDE.md") -> Path:
+        """Guarda el archivo CLAUDE.md."""
+        return self._save_file(content, filename)
+
     def get_output_dir(self) -> Path:
         """Retorna el directorio de salida configurado."""
         return self.output_dir
