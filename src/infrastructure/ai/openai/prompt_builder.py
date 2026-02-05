@@ -15,26 +15,47 @@ class PromptBuilder:
 
     SYSTEM_PROMPT_POM = """Eres un experto en Page Object Model (POM) para Playwright con TypeScript.
 
+REGLAS CRÍTICAS:
+1. SOLO usa selectores que aparecen EXACTAMENTE en los tests proporcionados
+2. NO inventes, modifiques ni "mejores" selectores
+3. Los tests son código VALIDADO y FUNCIONAL - replica su lógica exactamente
+4. NO asumas elementos que no están en los tests
+5. Si un selector es largo o complejo, úsalo tal cual está
+
 Tus responsabilidades:
 - Diseñar estructuras POM claras y mantenibles
+- Extraer selectores EXACTOS de los tests
 - Seguir best practices de Playwright
-- Usar selectores data-testid cuando sea posible
 - Crear métodos reutilizables y bien nombrados
-- Documentar claramente cada componente"""
+- Documentar claramente cada componente
+
+IMPORTANTE: Tu trabajo es DOCUMENTAR lo que existe, NO inventar mejoras."""
 
     SYSTEM_PROMPT_CUCUMBER = """Eres un experto en testing BDD con Cucumber y Playwright.
 
+REGLAS CRÍTICAS:
+1. SOLO usa selectores de los tests originales - NO inventes nuevos
+2. Replica EXACTAMENTE la lógica de los tests validados
+3. NO modifiques ni "mejores" los selectores existentes
+4. Los tests funcionan - respeta su implementación
+
 Tus responsabilidades:
 - Escribir features con sintaxis Gherkin clara
-- Crear step definitions TypeScript bien estructuradas
+- Crear step definitions TypeScript usando POM
 - Integrar Cucumber con Playwright correctamente
 - Seguir patrones BDD estándar
 - Usar World context apropiadamente"""
 
     SYSTEM_PROMPT_PLAYWRIGHT = """Eres un experto en testing E2E con Playwright y TypeScript.
 
+REGLAS CRÍTICAS:
+1. SOLO refactoriza para usar POM - NO cambies selectores
+2. Usa EXACTAMENTE los mismos selectores de los tests originales
+3. Los tests son FUNCIONALES - no los "mejores", solo organízalos
+4. NO inventes nuevos elementos ni modifices selectores
+
 Tus responsabilidades:
-- Refactorizar tests para usar POM
+- Refactorizar tests para usar POM (sin cambiar selectores)
 - Mantener estructura BDD con test.step()
 - Crear fixtures y data providers eficientes
 - Organizar tests de forma modular
@@ -88,49 +109,106 @@ Actualiza y mejora esta estructura existente:
 ```
 """
 
-        prompt = f"""Analiza los siguientes tests Playwright y genera documentación POM.
+        prompt = f"""Analiza los siguientes tests Playwright VALIDADOS Y FUNCIONALES.
 
 {tests_section}
 
 {existing_pom_section}
 
+⚠️ RESTRICCIONES CRÍTICAS:
+1. USA SOLO los selectores que aparecen en los tests - NO inventes nuevos
+2. NO modifiques ni "mejores" los selectores existentes
+3. Si un selector usa text(), xpath, o css complejo - úsalo TAL CUAL
+4. Estos tests FUNCIONAN - replica su lógica exactamente
+5. NO asumas elementos que no están explícitos en los tests
+
 ## Genera DOS documentos markdown:
 
-### 1. POM.md
-Estructura de directorios y métodos del POM:
-- Árbol de carpetas (tests/pages/, tests/components/)
-- Lista de Page Objects con métodos públicos
-- Convenciones de naming
-- Diagrama de dependencias
+### 1. POM.md - DEBE CONTENER:
+**Estructura del archivo:**
+```
+# Page Object Model - [Nombre del Proyecto]
 
-### 2. POM-components.md
-Implementaciones detalladas en TypeScript:
-- Código completo de cada Page Object
-- Path recomendado para cada archivo
-- Explicación de selectores y por qué se eligieron
-- Ejemplos de uso de cada método
-- Imports necesarios
+## 📁 Estructura de Directorios
+[Árbol de carpetas: tests/pages/, tests/components/, tests/fixtures/]
+
+## 📄 Page Objects
+
+### LoginPage
+**Path:** tests/pages/LoginPage.ts
+**Métodos:**
+- fillUsername(username: string): LoginPage
+- fillPassword(password: string): LoginPage
+- clickLogin(): Promise<void>
+[etc...]
+
+[Repetir para cada Page Object]
+
+## 🔧 Convenciones
+[Naming, retorno de métodos, tipos]
+
+## 🗺️ Diagrama de Dependencias
+[Qué Page Objects usan otros]
+```
+
+### 2. POM-components.md - DEBE CONTENER:
+**Estructura del archivo:**
+```
+# Implementaciones POM
+
+## LoginPage
+
+**Path:** `tests/pages/LoginPage.ts`
+
+**Código:**
+\`\`\`typescript
+import {{ Page }} from '@playwright/test';
+
+export class LoginPage {{
+  constructor(private page: Page) {{}}
+
+  async fillUsername(username: string) {{
+    // Selector EXACTO del test original:
+    await this.page.locator('input[name="uid"]').fill(username);
+    return this;
+  }}
+  // ... más métodos con selectores EXACTOS
+}}
+\`\`\`
+
+**Selectores Utilizados:**
+- `input[name="uid"]` - Campo username (del test original línea X)
+- [lista todos los selectores EXACTOS con su origen]
+
+**Uso:**
+\`\`\`typescript
+const loginPage = new LoginPage(page);
+await loginPage.fillUsername('user').fillPassword('pass');
+\`\`\`
+
+[Repetir sección completa para cada Page Object]
+```
 
 **Formato de respuesta:**
 
 ```markdown
 # POM.md
 
-[Contenido de POM.md aquí]
+[Contenido COMPLETO de POM.md aquí]
 
 ---
 
 # POM-components.md
 
-[Contenido de POM-components.md aquí]
+[Contenido COMPLETO de POM-components.md aquí]
 ```
 
-**Requisitos:**
-- Usa selectores data-testid cuando sea posible
-- Métodos deben retornar Page Objects (fluent interface)
-- Agrupa lógicamente por páginas/secciones
+**Requisitos OBLIGATORIOS:**
+- Usa EXACTAMENTE los selectores de los tests (no inventes ni modifiques)
+- Si selector es text() o xpath - cópialo tal cual
+- Métodos retornan Page Objects (fluent interface)
 - Incluye tipos TypeScript estrictos
-- Documenta cada método con JSDoc"""
+- Documenta ORIGEN de cada selector (del test X)"""
 
         return prompt
 
@@ -155,35 +233,53 @@ Implementaciones detalladas en TypeScript:
 
         examples_section = "\n".join(test_examples)
 
-        prompt = f"""Convierte estos tests Playwright a Cucumber + Playwright.
+        prompt = f"""Convierte estos tests Playwright VALIDADOS a Cucumber + Playwright.
 
 {examples_section}
 
-## Genera cucumber.md con:
+⚠️ RESTRICCIONES CRÍTICAS:
+1. USA los mismos selectores de los tests - NO inventes ni modifiques
+2. Replica EXACTAMENTE las acciones de los tests originales
+3. NO asumas elementos adicionales
+4. Los tests funcionan - solo convierte el formato, no la lógica
+
+## Genera cucumber.md con ESTAS SECCIONES:
 
 ### 1. Feature Files (.feature)
-- Sintaxis Gherkin completa
-- Scenarios bien estructurados
-- Background cuando aplique
-- Examples para data-driven tests
+```gherkin
+# login.feature
+Feature: Login funcionalidad
+  [Scenarios basados en tests originales]
+```
 
 ### 2. Step Definitions (.ts)
-- Implementación usando POM
-- World context configurado
-- Hooks (Before/After) necesarios
-- Manejo de errores
+```typescript
+// login.steps.ts
+import {{ Given, When, Then }} from '@cucumber/cucumber';
+import {{ LoginPage }} from '../pages/LoginPage';
+
+Given('usuario está en login', async function() {{
+  // Usa Page Objects con selectores EXACTOS de tests originales
+}});
+```
 
 ### 3. Configuración
-- cucumber.config.ts
-- Integración con Playwright
-- Scripts package.json
+```typescript
+// cucumber.config.ts
+[Config completa]
+```
+
+```json
+// package.json scripts
+[Scripts para ejecutar]
+```
 
 ### 4. Guía de Uso
-- Cómo ejecutar tests
-- Cómo añadir nuevos scenarios
-- Best practices
+- Comandos de ejecución
+- Estructura de archivos
+- Cómo añadir scenarios
 
-**Formato:** Markdown con secciones claras y bloques de código ejecutables."""
+**IMPORTANTE:** Step definitions DEBEN usar Page Objects con selectores EXACTOS del test original."""
 
         return prompt
 
@@ -206,34 +302,61 @@ Implementaciones detalladas en TypeScript:
 
         examples_section = "\n".join(test_examples)
 
-        prompt = f"""Refactoriza estos tests Playwright para usar POM.
+        prompt = f"""Refactoriza estos tests Playwright FUNCIONALES para usar POM.
 
 {examples_section}
 
-## Genera playwright.md con:
+⚠️ RESTRICCIONES CRÍTICAS:
+1. SOLO cambia selectores directos por llamadas a Page Objects
+2. Los Page Objects DEBEN usar los mismos selectores exactos
+3. NO modifiques la lógica ni los selectores originales
+4. Mantiene TODAS las aserciones y validaciones tal cual
+5. Estos tests FUNCIONAN - solo organízalos con POM
+
+## Genera playwright.md con ESTAS SECCIONES:
 
 ### 1. Tests Refactorizados
-- Usa Page Objects en lugar de selectores directos
-- Mantiene test.step() con Gherkin
-- Imports correctos de Page Objects
-- Código limpio y DRY
+```typescript
+import {{ test, expect }} from '@playwright/test';
+import {{ LoginPage }} from './pages/LoginPage';
+
+test('Login con credenciales válidas', async ({{ page }}) => {{
+  const loginPage = new LoginPage(page);
+
+  await test.step('Given usuario en login', async () => {{
+    await page.goto('/login');
+  }});
+
+  await test.step('When ingresa credenciales válidas', async () => {{
+    // Usa Page Object con selectores EXACTOS del test original
+    await loginPage.fillUsername('user');
+    await loginPage.fillPassword('pass');
+    await loginPage.clickLogin();
+  }});
+
+  await test.step('Then ve dashboard', async () => {{
+    // Mismas aserciones del test original
+    await expect(page).toHaveURL(/dashboard/);
+  }});
+}});
+```
 
 ### 2. Data Providers (Fixtures)
-- Fixtures para datos de test
-- test.describe.configure() para paralelización
-- Ejemplos de data-driven tests
+```typescript
+// fixtures/test-data.ts
+export const loginData = {{ ... }};
+```
 
-### 3. Organización
-- Agrupación por módulos/features
-- Reutilización de steps comunes
-- Hooks compartidos (beforeEach, afterEach)
+### 3. Organización de Tests
+- Agrupación por features
+- Hooks compartidos
+- Reutilización de pasos comunes
 
-### 4. Ejemplos de Uso
-- Cómo ejecutar tests
-- Cómo añadir nuevos tests
-- Patrones recomendados
+### 4. Guía de Ejecución
+- Comandos para ejecutar
+- Estructura de archivos
+- Cómo añadir tests nuevos
 
-**Formato:** Markdown con código TypeScript completo y ejecutable.
-**Objetivo:** Tests mantenibles y escalables usando POM."""
+**CRÍTICO:** El código refactorizado debe hacer EXACTAMENTE lo mismo que el original, solo usando POM."""
 
         return prompt
